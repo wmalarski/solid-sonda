@@ -1,0 +1,88 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": [
+    "worker-configuration.d.ts"
+  ],
+  "plugins": [
+    "import",
+    "typescript",
+    "unicorn",
+    "jsx-a11y",
+    "oxc",
+    "promise"
+  ],
+  "categories": {
+    "correctness": "error",
+    "nursery": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "restriction": "error",
+    "style": "error",
+    "suspicious": "error"
+  },
+  "globals": {
+    "document": "readonly",
+    "HTMLElement": "readonly",
+    "URLSearchParams": "readonly",
+    "URL": "readonly",
+    "console": "readonly",
+    "window": "readonly",
+    "FormData": "readonly",
+    "AbortController": "readonly",
+    "crypto": "readonly",
+    "Response": "readonly",
+    "navigator": "readonly",
+    "setTimeout": "readonly",
+    "WebSocketPair": "readonly",
+    "WebSocketRequestResponsePair": "readonly",
+    "WebSocket": "readonly",
+    "clearTimeout": "readonly"
+  },
+  "rules": {
+    "eslint/arrow-body-style": "off",
+    "eslint/capitalized-comments": "off",
+    "eslint/complexity": "off",
+    "eslint/id-length": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-statements": "off",
+    "eslint/no-empty-function": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-ternary": "off",
+    "eslint/no-undefined": "off",
+    "eslint/prefer-destructuring": "off",
+    "eslint/sort-imports": "off",
+    "import/consistent-type-specifier-style": "off",
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    "import/max-dependencies": "off",
+    "import/no-named-export": "off",
+    "import/no-namespace": "off",
+    "import/no-relative-parent-imports": "off",
+    "import/no-unassigned-import": "off",
+    "import/prefer-default-export": "off",
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "promise/catch-or-return": "off",
+    "typescript/consistent-type-definitions": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "typescript/promise-function-async": "off",
+    "typescript/strict-void-return": "off",
+    "typescript/strict-boolean-expressions": "off",
+    "typescript/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
+      }
+    ],
+    "typescript/prefer-readonly-parameter-types": "off",
+    "unicorn/no-array-reduce": "off",
+    "unicorn/no-null": "off",
+    "unicorn/number-literal-case": "off",
+    "unicorn/numeric-separators-style": "off",
+    "unicorn/prefer-dom-node-append": "off",
+    "unicorn/prefer-dom-node-remove": "off"
+  }
+}
