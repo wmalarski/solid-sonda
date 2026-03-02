@@ -13,6 +13,7 @@ export default defineConfig(() => {
   const isSonda = process.env.MODE === "sonda";
   return {
     build: {
+      rollupOptions: { input: ["index.html", "devtools.html"] },
       sourcemap: isDev || isSonda,
       target: "esnext",
     },
