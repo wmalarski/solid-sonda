@@ -10,65 +10,7 @@ import {
 } from "solid-js";
 
 const enDict = {
-  board: {
-    account: {
-      anonymous: "Anonymous",
-      name: "Name",
-      update: "Update name",
-      updateDescription: "Enter updated profile information.",
-    },
-    forms: {
-      createBoard: "Create Board",
-      deleteBoard: "Delete board",
-      description: "Description",
-      insertDescription: "Enter new board information.",
-      title: "Title",
-      update: "Update board",
-      updateDescription: "Enter updated board information.",
-      xSectionDefault: "Sprint 1",
-      ySectionDefault: "Feature 1",
-    },
-    info: {
-      aboutProject: "About project",
-    },
-    invite: {
-      acceptInvite: "Accept invite",
-      copy: "Copy",
-      invite: "Invite",
-      share: "Copy invite to the board.",
-    },
-    sections: {
-      confirmDelete: "Confirm delete task",
-      deleteSection: "Delete axis",
-      insertDescription: "Enter new axis information.",
-      insertSection: "Add axis",
-      name: "Name",
-      updateDescription: "Enter updated axis details.",
-      updateSection: "Update axis",
-    },
-    tasks: {
-      confirmDelete: "Confirm delete task",
-      description: "Description",
-      estimate: "Estimation",
-      insertDescription: "Enter new task information.",
-      insertTask: "Add task",
-      link: "Link",
-      title: "Title",
-      updateDescription: "Enter updated task information.",
-      updateTask: "Update task",
-    },
-    tools: {
-      delete: "Delete",
-      export: "Export as PNG",
-      pane: "Hand (panning tool)",
-      task: "Task",
-    },
-    zoom: {
-      reset: "Reset zoom",
-      zoomIn: "Zoom in",
-      zoomOut: "Zoom out",
-    },
-  },
+  board: {},
   common: {
     cancel: "Cancel",
     clear: "Clear",
@@ -88,16 +30,9 @@ const enDict = {
   },
   info: {
     description:
-      "Solid User Stories app is a non-trivial local first demo application built using SolidJS.",
+      "Solid Launch Midnight app is a non-trivial local first demo application built using SolidJS.",
     madeBy: "Made by wmalarski",
-    title: "Solid User Stories",
-  },
-  notFound: {
-    title: "Not Found",
-  },
-  theme: {
-    setDark: "Set dark theme",
-    setLight: "Set light theme",
+    title: "Solid Launch Midnight",
   },
 };
 

@@ -4,10 +4,6 @@ export const manifestPlugin = (): NonNullable<UserConfig["plugins"]>[0] => {
   return {
     generateBundle(_options) {
       const manifest = {
-        action: {
-          default_popup: "index.html",
-          default_title: "Click to open panel",
-        },
         description: "Solid Launch Midnight devtools",
         devtools_page: "index.html",
         host_permissions: ["https://*/*", "http://*/*"],
@@ -19,7 +15,7 @@ export const manifestPlugin = (): NonNullable<UserConfig["plugins"]>[0] => {
         },
         manifest_version: 3,
         name: "Solid Launch Midnight",
-        permissions: ["cookies", "activeTab", "storage"],
+        permissions: ["activeTab", "storage"],
         version: "1.0",
       };
 
