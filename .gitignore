@@ -1,4 +1,5 @@
 dist
+dist-zip
 .wrangler
 .output
 .vercel

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "dev": "vite",
+    "dev": "MODE=dev vite build --watch",
+    "sonda": "MODE=sonda vite build",
     "build": "vite build",
     "serve": "vite preview",
     "lint": "oxlint --type-aware --fix --fix-suggestions",

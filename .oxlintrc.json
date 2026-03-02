@@ -23,20 +23,9 @@
   "globals": {
     "document": "readonly",
     "HTMLElement": "readonly",
-    "URLSearchParams": "readonly",
-    "URL": "readonly",
     "console": "readonly",
-    "window": "readonly",
-    "FormData": "readonly",
-    "AbortController": "readonly",
-    "crypto": "readonly",
-    "Response": "readonly",
-    "navigator": "readonly",
-    "setTimeout": "readonly",
-    "WebSocketPair": "readonly",
-    "WebSocketRequestResponsePair": "readonly",
-    "WebSocket": "readonly",
-    "clearTimeout": "readonly"
+    "process": "readonly",
+    "chrome": "readonly"
   },
   "rules": {
     "eslint/arrow-body-style": "off",

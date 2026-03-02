@@ -17,8 +17,8 @@ export const ErrorFallback = (error: unknown, reset: VoidFunction) => {
     <div class="flex w-full justify-center pt-10">
       <Card class="w-full max-w-md" variant="bordered">
         <CardBody class="items-center">
-          <XCircleIcon class="size-10 text-error" />
           <header class="flex items-center justify-between gap-2 text-error">
+            <XCircleIcon class="size-10 text-error" />
             <h2 class={cardTitleRecipe()}>{t("error.title")}</h2>
           </header>
           <span class="text-center">
