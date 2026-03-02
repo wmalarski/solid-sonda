@@ -12,15 +12,5 @@ export const BoardRoute: Component = () => {
     console.log("chrome.devtools.panels.elements", chrome?.devtools?.panels?.elements);
   });
 
-  //   chrome.devtools.panels.create(
-  //     "My Panel",
-  //     "MyPanelIcon.png",
-  //     "Panel.html",
-  //     function BoardRoute(panel) {
-  //       // code invoked on panel creation
-  //       console.log("code invoked on panel creation", panel);
-  //     },
-  //   );
-
   return <p class="bg-red-600">Hello</p>;
 };

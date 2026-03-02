@@ -4,23 +4,17 @@ export const manifestPlugin = (): NonNullable<UserConfig["plugins"]>[0] => {
   return {
     generateBundle(_options) {
       const manifest = {
-        // action: {
-        //   default_popup: "index.html",
-        //   default_title: "Click to open panel",
-        // },
         description: "Solid Launch Midnight devtools",
         devtools_page: "devtools.html",
-        // host_permissions: ["https://*/*", "http://*/*"],
-        // icons: {
-        //   "128": "images/128x128.png",
-        //   "16": "images/16x16.png",
-        //   "32": "images/32x32.png",
-        //   "48": "images/48x48.png",
-        // },
+        icons: {
+          "128": "images/128x128.png",
+          "16": "images/16x16.png",
+          "32": "images/32x32.png",
+          "48": "images/48x48.png",
+        },
         manifest_version: 3,
         name: "Solid Launch Midnight",
         // permissions: ["sidePanel", "activeTab", "storage"],
-        // side_panel: { default_path: "index.html" },
         version: "1.0",
       };
 
