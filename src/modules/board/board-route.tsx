@@ -1,16 +1,32 @@
-import { onMount, type Component } from "solid-js";
+import { createEffect, For, type Component } from "solid-js";
+import { createInspectedWindowResources } from "~/integrations/chrome/inspected-window";
 
-export const BoardRoute: Component = () => {
-  onMount(() => {
-    // oxlint-disable-next-line typescript/no-unnecessary-condition
-    console.log("chrome", chrome);
-    // oxlint-disable-next-line typescript/no-unnecessary-condition
-    console.log("chrome.devtools", chrome?.devtools);
-    // oxlint-disable-next-line typescript/no-unnecessary-condition
-    console.log("chrome.devtools.panels", chrome?.devtools?.panels);
-    // oxlint-disable-next-line typescript/no-unnecessary-condition
-    console.log("chrome.devtools.panels.elements", chrome?.devtools?.panels?.elements);
+type ResourceListItemProps = {
+  resource: chrome.devtools.inspectedWindow.Resource;
+};
+
+const ResourceListItem: Component<ResourceListItemProps> = (props) => {
+  createEffect(() => {
+    console.log("[props]", props.resource);
   });
 
-  return <p class="bg-red-600">Hello</p>;
+  return (
+    <pre>
+      {props.resource.url}
+      {JSON.stringify(props.resource, null, 2)}
+    </pre>
+  );
+};
+
+export const BoardRoute: Component = () => {
+  const inspectedWindowResources = createInspectedWindowResources();
+
+  return (
+    <div>
+      <p class="bg-red-600">Hello</p>
+      <For each={inspectedWindowResources()}>
+        {(resource) => <ResourceListItem resource={resource} />}
+      </For>
+    </div>
+  );
 };

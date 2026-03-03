@@ -54,6 +54,7 @@
     "oxc/no-optional-chaining": "off",
     "oxc/no-rest-spread-properties": "off",
     "promise/catch-or-return": "off",
+    "promise/avoid-new": "off",
     "typescript/consistent-type-definitions": "off",
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
