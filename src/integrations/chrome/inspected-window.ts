@@ -1,4 +1,4 @@
-import { createEffect, createResource, onCleanup } from "solid-js";
+import { createResource, onCleanup } from "solid-js";
 
 const getInspectedWindowResources = () => {
   return new Promise<chrome.devtools.inspectedWindow.Resource[]>((resolve) => {
@@ -8,25 +8,19 @@ const getInspectedWindowResources = () => {
   });
 };
 
-const createOnResourceAdded = (
-  // oxlint-disable-next-line promise/prefer-await-to-callbacks
-  callback: (resource: chrome.devtools.inspectedWindow.Resource) => void,
-) => {
-  createEffect(() => {
-    chrome.devtools.inspectedWindow.onResourceAdded.addListener(callback);
-    onCleanup(() => {
-      chrome.devtools.inspectedWindow.onResourceAdded.removeListener(callback);
-    });
-  });
-};
-
 export const createInspectedWindowResources = () => {
   const [inspectedWindowResources, { mutate }] = createResource(() =>
     getInspectedWindowResources(),
   );
 
-  createOnResourceAdded((resource) => {
+  const callback = (resource: chrome.devtools.inspectedWindow.Resource) => {
     mutate((value) => (value ? [...value, resource] : [resource]));
+  };
+
+  chrome.devtools.inspectedWindow.onResourceAdded.addListener(callback);
+
+  onCleanup(() => {
+    chrome.devtools.inspectedWindow.onResourceAdded.removeListener(callback);
   });
 
   return inspectedWindowResources;

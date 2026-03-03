@@ -1,32 +1,19 @@
-import { createEffect, For, type Component } from "solid-js";
+import { Show, type Component } from "solid-js";
 import { createInspectedWindowResources } from "~/integrations/chrome/inspected-window";
-
-type ResourceListItemProps = {
-  resource: chrome.devtools.inspectedWindow.Resource;
-};
-
-const ResourceListItem: Component<ResourceListItemProps> = (props) => {
-  createEffect(() => {
-    console.log("[props]", props.resource);
-  });
-
-  return (
-    <pre>
-      {props.resource.url}
-      {JSON.stringify(props.resource, null, 2)}
-    </pre>
-  );
-};
+import { useDevtoolsTheme } from "~/integrations/chrome/panels";
+import { ResourcesList } from "./resources-list";
 
 export const BoardRoute: Component = () => {
+  const devtoolsTheme = useDevtoolsTheme();
+
   const inspectedWindowResources = createInspectedWindowResources();
 
   return (
-    <div>
+    <div data-theme={devtoolsTheme() === "dark" ? "business" : "corporate"}>
       <p class="bg-red-600">Hello</p>
-      <For each={inspectedWindowResources()}>
-        {(resource) => <ResourceListItem resource={resource} />}
-      </For>
+      <Show when={inspectedWindowResources()}>
+        {(resources) => <ResourcesList resources={resources()} />}
+      </Show>
     </div>
   );
 };
