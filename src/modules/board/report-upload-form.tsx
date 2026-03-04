@@ -2,6 +2,7 @@ import { decode } from "decode-formdata";
 import { createSignal, createUniqueId, type Component, type ComponentProps } from "solid-js";
 import * as v from "valibot";
 import { useI18n } from "~/integrations/i18n";
+import { ReportAsyncSchema, type ReportModel } from "~/integrations/sonda/schema";
 import { Button } from "~/ui/button/button";
 import { FieldError } from "~/ui/field-error/field-error";
 import { Fieldset, FieldsetLabel, FieldsetLegend } from "~/ui/fieldset/fieldset";
@@ -14,38 +15,15 @@ const ReportUploadFormSchema = v.objectAsync({
     v.file(),
     v.transformAsync((file) => file.text()),
     v.parseJson(),
-    v.objectAsync({
-      connections: v.array(
-        v.object({
-          kind: v.string(),
-          original: v.nullable(v.string()),
-          source: v.string(),
-          target: v.string(),
-        }),
-      ),
-      dependencies: v.array(
-        v.object({
-          name: v.string(),
-          paths: v.array(v.string()),
-        }),
-      ),
-      resources: v.array(
-        v.object({
-          brotli: v.optional(v.number()),
-          format: v.optional(v.string()),
-          gzip: v.optional(v.number()),
-          kind: v.string(),
-          name: v.string(),
-          parent: v.nullish(v.string()),
-          type: v.string(),
-          uncompressed: v.number(),
-        }),
-      ),
-    }),
+    ReportAsyncSchema,
   ),
 });
 
-export const ReportUploadForm: Component = () => {
+type ReportUploadFormProps = {
+  onReportSubmit: (report: ReportModel) => void;
+};
+
+export const ReportUploadForm: Component<ReportUploadFormProps> = (props) => {
   const { t } = useI18n();
 
   const formId = createUniqueId();
@@ -62,14 +40,12 @@ export const ReportUploadForm: Component = () => {
       decode(formData, { files: ["file"] }),
     );
 
-    console.log(parsed, formData);
-
     if (!parsed.success) {
       setIssues(parseFormValidationError(parsed.issues));
       return;
     }
 
-    console.log(parsed, formData);
+    props.onReportSubmit(parsed.output.file);
   };
 
   return (
