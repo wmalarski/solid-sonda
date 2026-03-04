@@ -10,7 +10,12 @@ import {
 } from "solid-js";
 
 const enDict = {
-  board: {},
+  board: {
+    report: {
+      label: "Upload JSON file",
+      title: "Upload Sonda report",
+    },
+  },
   common: {
     cancel: "Cancel",
     clear: "Clear",
