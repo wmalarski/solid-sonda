@@ -1,26 +1,65 @@
 import { createMemo, For, type Component } from "solid-js";
-import type { ReportModel } from "~/integrations/sonda/schema";
+import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
+
+type ResourceAssetEntry = {
+  asset: ResourceModel;
+  resource: chrome.devtools.inspectedWindow.Resource;
+  children: ResourceModel[];
+};
 
 type ResourceListItemProps = {
-  resource: chrome.devtools.inspectedWindow.Resource;
+  entry: ResourceAssetEntry;
 };
 
 const ResourceListItem: Component<ResourceListItemProps> = (props) => {
   return (
-    <pre>
-      {props.resource.url}
-      {JSON.stringify(props.resource, null, 2)}
-    </pre>
+    <li>
+      <pre>
+        {props.entry.resource.url}
+        {JSON.stringify(props.entry.asset, null, 2)}
+      </pre>
+    </li>
   );
 };
 
-const matchResources = (
+const matchResourcesToAssets = (
   report: ReportModel,
   resources: chrome.devtools.inspectedWindow.Resource[],
 ) => {
-  console.log({ report, resources });
+  // oxlint-disable-next-line typescript/no-explicit-any
+  const scriptResources = resources.filter((resource) =>
+    "type" in resource ? resource.type === "script" : true,
+  );
 
-  return true;
+  const pairs: ResourceAssetEntry[] = [];
+
+  let reportResources = report.resources;
+
+  for (const resource of scriptResources) {
+    const url = new URL(resource.url);
+
+    let asset: ResourceModel | null = null;
+    const keep: ResourceModel[] = [];
+    const children: ResourceModel[] = [];
+
+    for (const reportResource of reportResources) {
+      if (reportResource.name.includes(url.pathname)) {
+        asset = reportResource;
+      } else if (reportResource.parent?.includes(url.pathname)) {
+        children.push(reportResource);
+      } else {
+        keep.push(reportResource);
+      }
+    }
+
+    reportResources = keep;
+
+    if (asset) {
+      pairs.push({ asset, children, resource });
+    }
+  }
+
+  return pairs;
 };
 
 type ResourceListProps = {
@@ -29,12 +68,13 @@ type ResourceListProps = {
 };
 
 export const ResourcesList: Component<ResourceListProps> = (props) => {
-  const matched = createMemo(() => matchResources(props.report, props.resources));
+  const matched = createMemo(() => matchResourcesToAssets(props.report, props.resources));
 
   return (
-    <>
-      <pre>{JSON.stringify(matched(), null, 2)}</pre>
-      <For each={props.resources}>{(resource) => <ResourceListItem resource={resource} />}</For>
-    </>
+    <div>
+      <ul class="flex flex-col gap-1">
+        <For each={matched()}>{(entry) => <ResourceListItem entry={entry} />}</For>
+      </ul>
+    </div>
   );
 };

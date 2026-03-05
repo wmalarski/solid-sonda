@@ -27,7 +27,8 @@
     "process": "readonly",
     "chrome": "readonly",
     "FormData": "readonly",
-    "FileReader": "readonly"
+    "FileReader": "readonly",
+    "URL": "readonly"
   },
   "rules": {
     "eslint/arrow-body-style": "off",
