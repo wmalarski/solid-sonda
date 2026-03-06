@@ -1,5 +1,7 @@
-import { createMemo, For, type Component } from "solid-js";
+import { Key } from "@solid-primitives/keyed";
+import { createMemo, type Component } from "solid-js";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
+import { List, ListRow } from "~/ui/list/list";
 
 type ResourceAssetEntry = {
   asset: ResourceModel;
@@ -13,12 +15,12 @@ type ResourceListItemProps = {
 
 const ResourceListItem: Component<ResourceListItemProps> = (props) => {
   return (
-    <li>
+    <ListRow>
       <pre>
         {props.entry.resource.url}
         {JSON.stringify(props.entry.asset, null, 2)}
       </pre>
-    </li>
+    </ListRow>
   );
 };
 
@@ -72,9 +74,11 @@ export const ResourcesList: Component<ResourceListProps> = (props) => {
 
   return (
     <div>
-      <ul class="flex flex-col gap-1">
-        <For each={matched()}>{(entry) => <ResourceListItem entry={entry} />}</For>
-      </ul>
+      <List>
+        <Key each={matched()} by={(entry) => entry.asset.name}>
+          {(entry) => <ResourceListItem entry={entry()} />}
+        </Key>
+      </List>
     </div>
   );
 };
