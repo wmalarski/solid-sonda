@@ -1,18 +1,19 @@
-import { type Component, type ComponentProps, Show, splitProps } from "solid-js";
+import { type Component, Show, omit } from "solid-js";
+import type { ComponentPropsWithClass } from "../utils/types";
 import { fieldErrorRecipe } from "./field-error.recipe";
 
-export type FieldErrorProps = Omit<ComponentProps<"span">, "children"> & {
+export type FieldErrorProps = Omit<ComponentPropsWithClass<"span">, "children"> & {
   message?: string;
   id: string;
 };
 
 export const FieldError: Component<FieldErrorProps> = (props) => {
-  const [variants, withoutVariants] = splitProps(props, ["message"]);
+  const withoutVariants = omit(props, "message");
 
   return (
-    <Show when={variants.message}>
+    <Show when={props.message}>
       <span role="alert" {...withoutVariants} class={fieldErrorRecipe({ class: props.class })}>
-        {variants.message}
+        {props.message}
       </span>
     </Show>
   );

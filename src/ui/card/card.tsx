@@ -1,5 +1,5 @@
-import { type Component, type ComponentProps, splitProps, type ValidComponent } from "solid-js";
-import { Dynamic, type DynamicProps } from "solid-js/web";
+import { Dynamic, type DynamicProps } from "@solidjs/web";
+import { type Component, type ComponentProps, omit, type ValidComponent } from "solid-js";
 import { cn } from "tailwind-variants";
 import type { ComponentVariantProps } from "../utils/types";
 import { cardActionsRecipe, cardRecipe, cardTitleRecipe } from "./card.recipe";
@@ -7,9 +7,20 @@ import { cardActionsRecipe, cardRecipe, cardTitleRecipe } from "./card.recipe";
 export type CardProps = ComponentVariantProps<"div", typeof cardRecipe>;
 
 export const Card: Component<CardProps> = (props) => {
-  const [split, rest] = splitProps(props, ["variant", "size", "side", "imageFull"]);
+  const withoutVariants = omit(props, "variant", "size", "side", "imageFull");
 
-  return <div {...rest} class={cardRecipe({ class: props.class, ...split })} />;
+  return (
+    <div
+      {...withoutVariants}
+      class={cardRecipe({
+        class: props.class,
+        imageFull: props.imageFull,
+        side: props.side,
+        size: props.size,
+        variant: props.variant,
+      })}
+    />
+  );
 };
 
 export type CardTitleProps<T extends ValidComponent> = DynamicProps<T>;
@@ -33,7 +44,15 @@ export const CardBody: Component<CardBodyProps> = (props) => {
 export type CardActionsProps = ComponentVariantProps<"div", typeof cardActionsRecipe>;
 
 export const CardActions: Component<CardActionsProps> = (props) => {
-  const [split, rest] = splitProps(props, ["justify"]);
+  const withoutVariants = omit(props, "justify");
 
-  return <div {...rest} class={cardActionsRecipe({ class: props.class, ...split })} />;
+  return (
+    <div
+      {...withoutVariants}
+      class={cardActionsRecipe({
+        class: props.class,
+        justify: props.justify,
+      })}
+    />
+  );
 };

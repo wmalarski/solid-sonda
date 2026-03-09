@@ -1,4 +1,4 @@
-import { onMount } from "solid-js";
+import { onSettled } from "solid-js";
 import { Button } from "~/ui/button/button";
 import { Card, CardBody } from "~/ui/card/card";
 import { cardTitleRecipe } from "~/ui/card/card.recipe";
@@ -8,7 +8,7 @@ import { useI18n } from "../../integrations/i18n";
 export const ErrorFallback = (error: unknown, reset: VoidFunction) => {
   const { t } = useI18n();
 
-  onMount(() => {
+  onSettled(() => {
     // oxlint-disable-next-line no-console
     console.error("ERROR", error);
   });

@@ -1,12 +1,22 @@
-import { A } from "@solidjs/router";
-import { type Component, splitProps } from "solid-js";
+import { type Component, omit } from "solid-js";
 import type { ComponentVariantProps } from "../utils/types";
 import { linkRecipe } from "./link.recipe";
 
-export type LinkProps = ComponentVariantProps<typeof A, typeof linkRecipe>;
+export type LinkProps = ComponentVariantProps<"a", typeof linkRecipe>;
 
 export const Link: Component<LinkProps> = (props) => {
-  const [split, rest] = splitProps(props, ["color", "hover", "size"]);
+  const withoutVariants = omit(props, "color", "hover", "size");
 
-  return <A {...rest} class={linkRecipe({ class: props.class, ...split })} />;
+  return (
+    // oxlint-disable-next-line jsx_a11y/anchor-has-content
+    <a
+      {...withoutVariants}
+      class={linkRecipe({
+        class: props.class,
+        color: props.color,
+        hover: props.hover,
+        size: props.size,
+      })}
+    />
+  );
 };

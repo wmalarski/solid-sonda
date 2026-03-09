@@ -1,5 +1,4 @@
-import { Key } from "@solid-primitives/keyed";
-import { createMemo, type Component } from "solid-js";
+import { createMemo, For, type Component } from "solid-js";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
 import { List, ListRow } from "~/ui/list/list";
 
@@ -75,9 +74,9 @@ export const ResourcesList: Component<ResourceListProps> = (props) => {
   return (
     <div>
       <List>
-        <Key each={matched()} by={(entry) => entry.asset.name}>
+        <For each={matched()} keyed={(entry) => entry.asset.name}>
           {(entry) => <ResourceListItem entry={entry()} />}
-        </Key>
+        </For>
       </List>
     </div>
   );

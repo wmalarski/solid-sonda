@@ -1,5 +1,4 @@
 import tailwindcss from "@tailwindcss/vite";
-import devtools from "solid-devtools/vite";
 import sonda from "sonda/vite";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
@@ -18,7 +17,6 @@ export default defineConfig(() => {
       target: "esnext",
     },
     plugins: [
-      devtools(),
       sonda({ enabled: isSonda, open: false }),
       viteTsConfigPaths(),
       solidPlugin(),

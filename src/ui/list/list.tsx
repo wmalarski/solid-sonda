@@ -1,4 +1,4 @@
-import { type Component, splitProps } from "solid-js";
+import { type Component, omit } from "solid-js";
 import type { ComponentVariantProps } from "../utils/types";
 import { listColumnRecipe, listRecipe, listRowRecipe } from "./list.recipe";
 
@@ -17,6 +17,15 @@ export const ListRow: Component<ListRowProps> = (props) => {
 export type ListColumnProps = ComponentVariantProps<"div", typeof listColumnRecipe>;
 
 export const ListColumn: Component<ListColumnProps> = (props) => {
-  const [variants, withoutVariants] = splitProps(props, ["grow", "wrap"]);
-  return <div {...withoutVariants} class={listColumnRecipe({ class: props.class, ...variants })} />;
+  const withoutVariants = omit(props, "grow", "wrap");
+  return (
+    <div
+      {...withoutVariants}
+      class={listColumnRecipe({
+        class: props.class,
+        grow: props.grow,
+        wrap: props.wrap,
+      })}
+    />
+  );
 };

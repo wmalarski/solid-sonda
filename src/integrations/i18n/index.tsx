@@ -75,7 +75,7 @@ export const I18nContext = createContext<I18nContextValue>({
 export const I18nContextProvider: Component<ParentProps> = (props) => {
   const value = createI18nValue();
 
-  return <I18nContext.Provider value={value}>{props.children}</I18nContext.Provider>;
+  return <I18nContext value={value}>{props.children}</I18nContext>;
 };
 
 export const useI18n = () => {

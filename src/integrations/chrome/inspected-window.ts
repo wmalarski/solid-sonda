@@ -1,4 +1,4 @@
-import { createResource, onCleanup } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 
 const getInspectedWindowResources = () => {
   return new Promise<chrome.devtools.inspectedWindow.Resource[]>((resolve) => {
@@ -9,12 +9,12 @@ const getInspectedWindowResources = () => {
 };
 
 export const createInspectedWindowResources = () => {
-  const [inspectedWindowResources, { mutate }] = createResource(() =>
+  const [inspectedWindowResources, setInspectedWindowResources] = createSignal(() =>
     getInspectedWindowResources(),
   );
 
   const callback = (resource: chrome.devtools.inspectedWindow.Resource) => {
-    mutate((value) => (value ? [...value, resource] : [resource]));
+    setInspectedWindowResources((value) => [...value, resource]);
   };
 
   chrome.devtools.inspectedWindow.onResourceAdded.addListener(callback);

@@ -1,7 +1,7 @@
-import { type Component, type ComponentProps, splitProps } from "solid-js";
+import { type Component, type ComponentProps, omit } from "solid-js";
 import { useI18n } from "~/integrations/i18n";
 import { Button } from "../button/button";
-import type { ComponentVariantProps } from "../utils/types";
+import type { ComponentPropsWithClass, ComponentVariantProps } from "../utils/types";
 import {
   modalActionRecipe,
   modalBackdropRecipe,
@@ -24,46 +24,54 @@ export const openDialog = (dialogId: string) => {
 export type DialogProps = ComponentVariantProps<"dialog", typeof modalRecipe, { id: string }>;
 
 export const Dialog: Component<DialogProps> = (props) => {
-  const [variants, withoutVariants] = splitProps(props, ["open", "horizontal", "vertical"]);
+  const withoutVariants = omit(props, "open", "horizontal", "vertical");
   return (
     <dialog
       {...withoutVariants}
       style={{ transition: "none" }}
-      class={modalRecipe({ class: props.class, ...variants })}
+      class={modalRecipe({
+        class: props.class,
+        horizontal: props.horizontal,
+        open: props.open,
+        vertical: props.vertical,
+      })}
     />
   );
 };
 
-export type DialogTriggerProps = ComponentProps<typeof Button> & {
-  for: string;
-  onClick?: (event: MouseEvent) => void;
-};
+export type DialogTriggerProps = ComponentPropsWithClass<
+  typeof Button,
+  {
+    for: string;
+    onClick?: (event: MouseEvent) => void;
+  }
+>;
 
 export const DialogTrigger: Component<DialogTriggerProps> = (props) => {
-  const [forValue, withoutFor] = splitProps(props, ["for", "onClick"]);
+  const withoutFor = omit(props, "for", "onClick");
 
   const onClick: ComponentProps<"button">["onClick"] = (event) => {
     props.onClick?.(event);
-    openDialog(forValue.for);
+    openDialog(props.for);
   };
 
   return <Button {...withoutFor} onClick={onClick} type="button" />;
 };
 
-export type DialogBoxProps = ComponentProps<"div">;
+export type DialogBoxProps = ComponentPropsWithClass<"div">;
 
 export const DialogBox: Component<DialogBoxProps> = (props) => {
   return <div {...props} class={modalBoxRecipe({ class: props.class })} />;
 };
 
-export type DialogTitleProps = ComponentProps<"h3">;
+export type DialogTitleProps = ComponentPropsWithClass<"h3">;
 
 export const DialogTitle: Component<DialogTitleProps> = (props) => {
   // oxlint-disable-next-line heading-has-content
   return <h3 {...props} class={modalTitleRecipe({ class: props.class })} />;
 };
 
-export type DialogDescriptionProps = ComponentProps<"p">;
+export type DialogDescriptionProps = ComponentPropsWithClass<"p">;
 
 export const DialogDescription: Component<DialogDescriptionProps> = (props) => {
   return <p {...props} class={modalDescriptionRecipe({ class: props.class })} />;
@@ -81,7 +89,7 @@ export const DialogBackdrop: Component<DialogBackdropProps> = (props) => {
   );
 };
 
-export type DialogCloseProps = Omit<ComponentProps<typeof Button>, "children">;
+export type DialogCloseProps = Omit<ComponentPropsWithClass<typeof Button>, "children">;
 
 export const DialogClose: Component<DialogCloseProps> = (props) => {
   const { t } = useI18n();
@@ -93,7 +101,7 @@ export const DialogClose: Component<DialogCloseProps> = (props) => {
   );
 };
 
-export type DialogActionsProps = ComponentProps<"div">;
+export type DialogActionsProps = ComponentPropsWithClass<"div">;
 
 export const DialogActions: Component<DialogActionsProps> = (props) => {
   return <div {...props} class={modalActionRecipe({ class: props.class })} />;

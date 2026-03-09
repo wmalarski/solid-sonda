@@ -43,6 +43,6 @@ export const getInvalidStateProps = ({ errorMessageId, isInvalid }: GetInvalidSt
 
   return {
     "aria-describedby": errorMessageId,
-    "aria-invalid": true,
+    "aria-invalid": "true" as const,
   };
 };
