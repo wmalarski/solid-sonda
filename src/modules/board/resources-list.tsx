@@ -1,6 +1,7 @@
-import { createMemo, For, type Component } from "solid-js";
+import { createMemo, createSignal, For, Show, type Component } from "solid-js";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
-import { List, ListRow } from "~/ui/list/list";
+import { Menu, MenuItem } from "~/ui/menu/menu";
+import { ResourcesTreemap } from "./resource-treemap";
 
 type ResourceAssetEntry = {
   asset: ResourceModel;
@@ -10,16 +11,18 @@ type ResourceAssetEntry = {
 
 type ResourceListItemProps = {
   entry: ResourceAssetEntry;
+  onClick: () => void;
+  isSelected: boolean;
 };
 
 const ResourceListItem: Component<ResourceListItemProps> = (props) => {
   return (
-    <ListRow>
-      <pre>
-        {props.entry.resource.url}
-        {JSON.stringify(props.entry.asset, null, 2)}
-      </pre>
-    </ListRow>
+    <MenuItem behaviour={props.isSelected ? "active" : undefined}>
+      <button type="button" onClick={props.onClick} class="flex flex-col gap-1 items-start">
+        <span class="font-semibold">{props.entry.resource.url}</span>
+        <span>SIZE: {props.entry.asset.uncompressed}</span>
+      </button>
+    </MenuItem>
   );
 };
 
@@ -71,13 +74,37 @@ type ResourceListProps = {
 export const ResourcesList: Component<ResourceListProps> = (props) => {
   const matched = createMemo(() => matchResourcesToAssets(props.report, props.resources));
 
+  const [selectedIndex, setSelectedIndex] = createSignal(0);
+  const selected = createMemo(() => matched().at(selectedIndex()));
+
+  const onClickFactory = (index: number) => () => {
+    setSelectedIndex(index);
+  };
+
   return (
-    <div>
-      <List>
+    <div class="grid grid-cols-[1fr_2fr] gap-1">
+      <Menu class="w-full">
         <For each={matched()} keyed={(entry) => entry.asset.name}>
-          {(entry) => <ResourceListItem entry={entry()} />}
+          {(entry, index) => (
+            <ResourceListItem
+              isSelected={selectedIndex() === index()}
+              entry={entry()}
+              onClick={onClickFactory(index())}
+            />
+          )}
         </For>
-      </List>
+      </Menu>
+      <div>
+        <Show when={selected()}>
+          {(entry) => (
+            <ResourcesTreemap
+              asset={entry().asset}
+              children={entry().children}
+              resource={entry().resource}
+            />
+          )}
+        </Show>
+      </div>
     </div>
   );
 };

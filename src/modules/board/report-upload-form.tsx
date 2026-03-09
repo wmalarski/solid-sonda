@@ -72,7 +72,6 @@ export const ReportUploadForm: Component<ReportUploadFormProps> = (props) => {
         </div>
         <FieldError id="file-error" message={issues()?.errors?.file} />
       </Fieldset>
-      AAAA
     </form>
   );
 };
