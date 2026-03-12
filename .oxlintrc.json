@@ -28,7 +28,8 @@
     "chrome": "readonly",
     "FormData": "readonly",
     "FileReader": "readonly",
-    "URL": "readonly"
+    "URL": "readonly",
+    "DOM": "readonly"
   },
   "rules": {
     "eslint/arrow-body-style": "off",

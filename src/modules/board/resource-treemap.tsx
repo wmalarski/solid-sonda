@@ -1,4 +1,5 @@
-import { createMemo, type Component } from "solid-js";
+import * as d3 from "d3";
+import { createMemo, createUniqueId, For, type Component } from "solid-js";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
 
 type SetValueTreemapStructure = {
@@ -11,6 +12,7 @@ type TreemapStructure = {
   asset?: ResourceModel;
   children: TreemapStructure[];
   path: string;
+  sum: number;
 };
 
 type ResourcesTreemapProps = {
@@ -60,18 +62,24 @@ const toSimpleStructure = (structure: SetValueTreemapStructure): TreemapStructur
   const flatten =
     children.length === 1 && children[0].children.length > 0 ? children[0].children : children;
 
+  const assetWeight = structure.asset?.uncompressed ?? 0;
+  const sum = assetWeight + flatten.reduce((previous, current) => previous + current.sum, 0);
+
   return {
     asset: structure.asset,
     children: flatten,
     path: structure.path,
+    sum,
   };
 };
 
 export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
-  // const width = 100;
-  // const height = 100;
+  const width = 300;
+  const height = 400;
 
-  const result = createMemo(() => {
+  const color = d3.scaleSequential([8, 0], d3.interpolateMagma);
+
+  const packageStructure = createMemo(() => {
     const root: SetValueTreemapStructure = { children: new Map(), path: "/" };
 
     for (const child of props.children) {
@@ -82,11 +90,29 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     return toSimpleStructure(root);
   });
 
-  // const dd = createMemo(() => {
-  //   d3.hierarchy()
+  const root = createMemo(() => {
+    const data = packageStructure();
 
-  //   return null;
-  // })
+    const treemapFactory = d3
+      .treemap<TreemapStructure>()
+      .size([width, height])
+      .paddingOuter(3)
+      .paddingTop(19)
+      .paddingInner(1)
+      .round(true);
+
+    const hierarchy = d3
+      .hierarchy(data, (resource) => resource.children)
+      .sum((resource) => resource.sum)
+      // oxlint-disable-next-line unicorn/no-array-sort
+      .sort((a, b) => b.data.sum - a.data.sum);
+
+    return treemapFactory(hierarchy);
+  });
+
+  const shadowId = createUniqueId();
+
+  const group = createMemo(() => d3.group(root(), (d) => d.height));
 
   // const hierarchy = d3
   //   .hierarchy(props.data)
@@ -99,11 +125,37 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
 
   return (
     <div>
-      <pre>{JSON.stringify(result(), null, 2)}</pre>
+      <svg
+        class="w-full h-full z-10 isolate"
+        // width={width}
+        // height={height}
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <filter id={shadowId}>
+          <feDropShadow flood-opacity={0.3} dx={0} stdDeviation={3} />
+        </filter>
+        <For keyed={([entry]) => entry} each={group().entries().toArray()}>
+          {(entry) => (
+            <g filter={shadowId}>
+              <For each={entry()[1]}>
+                {(resource) => (
+                  <g transform={`translate(${resource().x0},${resource().y0})`}>
+                    <rect
+                      fill={color(resource().height)}
+                      width={resource().x1 - resource().x0}
+                      height={resource().y1 - resource().y0}
+                    />
+                  </g>
+                )}
+              </For>
+            </g>
+          )}
+        </For>
+      </svg>
+      {/* <pre>{JSON.stringify(packageStructure(), null, 2)}</pre>
       <pre>{JSON.stringify(props.asset, null, 2)}</pre>
       <pre>{JSON.stringify(props.children, null, 2)}</pre>
-      <pre>{JSON.stringify(props.resource, null, 2)}</pre>
-      <svg class="w-full h-full z-10 isolate"></svg>
+      <pre>{JSON.stringify(props.resource, null, 2)}</pre> */}
     </div>
   );
 };
