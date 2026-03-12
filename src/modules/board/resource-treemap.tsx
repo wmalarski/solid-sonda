@@ -3,12 +3,14 @@ import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
 
 type SetValueTreemapStructure = {
   asset?: ResourceModel;
+  path: string;
   children: Map<string, SetValueTreemapStructure>;
 };
 
 type TreemapStructure = {
   asset?: ResourceModel;
   children: TreemapStructure[];
+  path: string;
 };
 
 type ResourcesTreemapProps = {
@@ -18,45 +20,66 @@ type ResourcesTreemapProps = {
   children: ResourceModel[];
 };
 
-const setValue = (structure: SetValueTreemapStructure, paths: string[], model: ResourceModel) => {
-  const current = paths.pop();
+type SetValueArgs = {
+  structure: SetValueTreemapStructure;
+  paths: string[];
+  model: ResourceModel;
+  parents: string[];
+};
+
+const setValue = (args: SetValueArgs) => {
+  const current = args.paths.pop();
 
   if (!current) {
-    structure.asset = model;
+    args.structure.asset = args.model;
     return;
   }
 
-  const existingChild = structure.children.get(current);
+  args.parents.push(current);
+  const existingChild = args.structure.children.get(current);
 
   if (!existingChild) {
-    const newChild: SetValueTreemapStructure = { children: new Map() };
-    structure.children.set(current, newChild);
-    setValue(newChild, paths, model);
+    const newChild: SetValueTreemapStructure = {
+      children: new Map(),
+      path: args.parents.join("/"),
+    };
+    args.structure.children.set(current, newChild);
+    setValue({ ...args, structure: newChild });
     return;
   }
 
-  setValue(existingChild, paths, model);
+  setValue({ ...args, structure: existingChild });
 };
 
 const toSimpleStructure = (structure: SetValueTreemapStructure): TreemapStructure => {
-  return { asset: structure.asset, children: structure.children.values().toArray() };
+  const children = structure.children
+    .values()
+    .toArray()
+    .map((value) => toSimpleStructure(value));
+
+  const flatten =
+    children.length === 1 && children[0].children.length > 0 ? children[0].children : children;
+
+  return {
+    asset: structure.asset,
+    children: flatten,
+    path: structure.path,
+  };
 };
 
 export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
-  const width = 100;
-  const height = 100;
+  // const width = 100;
+  // const height = 100;
 
   const result = createMemo(() => {
-    // props.children.map()
-
-    const root: SetValueTreemapStructure = { children: new Map() };
+    const root: SetValueTreemapStructure = { children: new Map(), path: "/" };
 
     for (const child of props.children) {
       const paths = child.name.split("/").toReversed();
-      setValue(root, paths, child);
+      setValue({ model: child, parents: [], paths, structure: root });
     }
 
-    return root;
+    return toSimpleStructure(root);
   });
 
   // const dd = createMemo(() => {
