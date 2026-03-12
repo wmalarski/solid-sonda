@@ -98,6 +98,7 @@ export const ResourcesList: Component<ResourceListProps> = (props) => {
         <Show when={selected()}>
           {(entry) => (
             <ResourcesTreemap
+              report={props.report}
               asset={entry().asset}
               children={entry().children}
               resource={entry().resource}
