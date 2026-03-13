@@ -1,5 +1,12 @@
 import * as d3 from "d3";
-import { createMemo, createUniqueId, For, type Component } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  createUniqueId,
+  For,
+  type Component,
+} from "solid-js";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
 
 type SetValueTreemapStructure = {
@@ -74,9 +81,7 @@ const toSimpleStructure = (structure: SetValueTreemapStructure): TreemapStructur
 };
 
 export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
-  const width = 300;
-  const height = 400;
-
+  const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
   const color = d3.scaleSequential([8, 0], d3.interpolateMagma);
 
   const packageStructure = createMemo(() => {
@@ -90,24 +95,31 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     return toSimpleStructure(root);
   });
 
-  const root = createMemo(() => {
-    const data = packageStructure();
+  const width = 300;
+  const height = 400;
 
-    const treemapFactory = d3
+  const treemap = createMemo(() => {
+    return d3
       .treemap<TreemapStructure>()
       .size([width, height])
       .paddingOuter(3)
       .paddingTop(19)
       .paddingInner(1)
       .round(true);
+  });
 
-    const hierarchy = d3
-      .hierarchy(data, (resource) => resource.children)
-      .sum((resource) => resource.sum)
-      // oxlint-disable-next-line unicorn/no-array-sort
-      .sort((a, b) => b.data.sum - a.data.sum);
+  const hierarchy = createMemo(() => {
+    return (
+      d3
+        .hierarchy(packageStructure(), (resource) => resource.children)
+        .sum((resource) => resource.sum)
+        // oxlint-disable-next-line unicorn/no-array-sort
+        .sort((a, b) => b.data.sum - a.data.sum)
+    );
+  });
 
-    return treemapFactory(hierarchy);
+  const root = createMemo(() => {
+    return treemap()(hierarchy());
   });
 
   const shadowId = createUniqueId();
@@ -123,9 +135,30 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
   //   hierarchy,
   // );
 
+  createEffect(svgReference, (svg) => {
+    const abortController = new AbortController();
+    globalThis.window.addEventListener(
+      "resize",
+      () => {
+        console.log(
+          "[event]",
+          globalThis.window.innerWidth,
+          globalThis.window.innerHeight,
+          svg?.clientWidth,
+          svg?.clientHeight,
+        );
+      },
+      { signal: abortController.signal },
+    );
+    return () => {
+      abortController.abort();
+    };
+  });
+
   return (
     <div>
       <svg
+        ref={setSvgReference}
         class="w-full h-full z-10 isolate"
         // width={width}
         // height={height}

@@ -29,7 +29,7 @@
     "FormData": "readonly",
     "FileReader": "readonly",
     "URL": "readonly",
-    "DOM": "readonly"
+    "AbortController": "readonly"
   },
   "rules": {
     "eslint/arrow-body-style": "off",
