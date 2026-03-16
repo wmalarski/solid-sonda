@@ -22,13 +22,6 @@ type TreemapStructure = {
   sum: number;
 };
 
-type ResourcesTreemapProps = {
-  report: ReportModel;
-  asset: ResourceModel;
-  resource: chrome.devtools.inspectedWindow.Resource;
-  children: ResourceModel[];
-};
-
 type SetValueArgs = {
   structure: SetValueTreemapStructure;
   paths: string[];
@@ -80,9 +73,83 @@ const toSimpleStructure = (structure: SetValueTreemapStructure): TreemapStructur
   };
 };
 
-export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
-  const color = d3.scaleSequential([8, 0], d3.interpolateMagma);
+const colorInterpolation = d3.scaleSequential([8, 0], d3.interpolateMagma);
 
+type TreemapItemProps = {
+  node: d3.HierarchyRectangularNode<TreemapStructure>;
+};
+
+const TreemapItem: Component<TreemapItemProps> = (props) => {
+  return (
+    <g transform={`translate(${props.node.x0},${props.node.y0})`}>
+      <rect
+        fill={colorInterpolation(props.node.height)}
+        width={props.node.x1 - props.node.x0}
+        height={props.node.y1 - props.node.y0}
+      />
+    </g>
+  );
+};
+
+type TreemapContentProps = {
+  width: number;
+  height: number;
+  structure: TreemapStructure;
+};
+
+const TreemapContent: Component<TreemapContentProps> = (props) => {
+  const hierarchy = createMemo(() => {
+    return (
+      d3
+        .hierarchy(props.structure, (resource) => resource.children)
+        .sum((resource) => resource.sum)
+        // oxlint-disable-next-line unicorn/no-array-sort
+        .sort((a, b) => b.data.sum - a.data.sum)
+    );
+  });
+
+  const treemap = createMemo(() => {
+    return d3
+      .treemap<TreemapStructure>()
+      .size([props.width, props.height])
+      .paddingOuter(3)
+      .paddingTop(19)
+      .paddingInner(1)
+      .round(true);
+  });
+
+  const root = createMemo(() => {
+    return treemap()(hierarchy());
+  });
+
+  const shadowId = createUniqueId();
+
+  const group = createMemo(() => d3.group(root(), (d) => d.height));
+
+  return (
+    <>
+      <filter id={shadowId}>
+        <feDropShadow flood-opacity={0.3} dx={0} stdDeviation={3} />
+      </filter>
+      <For keyed={([entry]) => entry} each={group().entries().toArray()}>
+        {(entry) => (
+          <g filter={shadowId}>
+            <For each={entry()[1]}>{(resource) => <TreemapItem node={resource()} />}</For>
+          </g>
+        )}
+      </For>
+    </>
+  );
+};
+
+type ResourcesTreemapProps = {
+  report: ReportModel;
+  asset: ResourceModel;
+  resource: chrome.devtools.inspectedWindow.Resource;
+  children: ResourceModel[];
+};
+
+export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
   const packageStructure = createMemo(() => {
     const root: SetValueTreemapStructure = { children: new Map(), path: "/" };
 
@@ -94,29 +161,9 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     return toSimpleStructure(root);
   });
 
-  const hierarchy = createMemo(() => {
-    return (
-      d3
-        .hierarchy(packageStructure(), (resource) => resource.children)
-        .sum((resource) => resource.sum)
-        // oxlint-disable-next-line unicorn/no-array-sort
-        .sort((a, b) => b.data.sum - a.data.sum)
-    );
-  });
-
   const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
   const [width, setWidth] = createSignal(300);
   const [height, setHeight] = createSignal(400);
-
-  const treemap = createMemo(() => {
-    return d3
-      .treemap<TreemapStructure>()
-      .size([width(), height()])
-      .paddingOuter(3)
-      .paddingTop(19)
-      .paddingInner(1)
-      .round(true);
-  });
 
   const setSize = (svg?: SVGSVGElement) => {
     setWidth((current) => svg?.clientWidth ?? current);
@@ -142,14 +189,6 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     setSize(svg);
   };
 
-  const root = createMemo(() => {
-    return treemap()(hierarchy());
-  });
-
-  const shadowId = createUniqueId();
-
-  const group = createMemo(() => d3.group(root(), (d) => d.height));
-
   return (
     <div>
       <svg
@@ -159,26 +198,7 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
         height={height()}
         viewBox={`0 0 ${width()} ${height()}`}
       >
-        <filter id={shadowId}>
-          <feDropShadow flood-opacity={0.3} dx={0} stdDeviation={3} />
-        </filter>
-        <For keyed={([entry]) => entry} each={group().entries().toArray()}>
-          {(entry) => (
-            <g filter={shadowId}>
-              <For each={entry()[1]}>
-                {(resource) => (
-                  <g transform={`translate(${resource().x0},${resource().y0})`}>
-                    <rect
-                      fill={color(resource().height)}
-                      width={resource().x1 - resource().x0}
-                      height={resource().y1 - resource().y0}
-                    />
-                  </g>
-                )}
-              </For>
-            </g>
-          )}
-        </For>
+        <TreemapContent height={height()} structure={packageStructure()} width={width()} />
       </svg>
       {/* <pre>{JSON.stringify(packageStructure(), null, 2)}</pre>
       <pre>{JSON.stringify(props.asset, null, 2)}</pre>
