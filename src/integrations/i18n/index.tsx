@@ -35,9 +35,9 @@ const enDict = {
   },
   info: {
     description:
-      "Solid Launch Midnight app is a non-trivial local first demo application built using SolidJS.",
+      "Solid Sonda app is a non-trivial local first demo application built using SolidJS.",
     madeBy: "Made by wmalarski",
-    title: "Solid Launch Midnight",
+    title: "Solid Sonda",
   },
 };
 

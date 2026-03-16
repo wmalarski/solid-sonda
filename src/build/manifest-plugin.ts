@@ -4,7 +4,7 @@ export const manifestPlugin = (): NonNullable<UserConfig["plugins"]>[0] => {
   return {
     generateBundle(_options) {
       const manifest = {
-        description: "Solid Launch Midnight devtools",
+        description: "Solid Sonda devtools",
         devtools_page: "devtools.html",
         icons: {
           "128": "images/128x128.png",
@@ -13,7 +13,7 @@ export const manifestPlugin = (): NonNullable<UserConfig["plugins"]>[0] => {
           "48": "images/48x48.png",
         },
         manifest_version: 3,
-        name: "Solid Launch Midnight",
+        name: "Solid Sonda",
         // permissions: ["sidePanel", "activeTab", "storage"],
         version: "1.0",
       };

@@ -20,7 +20,7 @@ export default defineConfig(() => {
       solidPlugin(),
       tailwindcss(),
       manifestPlugin(),
-      isDev || isSonda ? undefined : zipPack({ outFileName: "solid-launch-midnight.zip" }),
+      isDev || isSonda ? undefined : zipPack({ outFileName: "solid-sonda.zip" }),
     ],
     resolve: {
       tsconfigPaths: true,
