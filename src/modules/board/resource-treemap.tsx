@@ -140,13 +140,7 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     globalThis.window.addEventListener(
       "resize",
       () => {
-        console.log(
-          "[event]",
-          globalThis.window.innerWidth,
-          globalThis.window.innerHeight,
-          svg?.clientWidth,
-          svg?.clientHeight,
-        );
+        
       },
       { signal: abortController.signal },
     );

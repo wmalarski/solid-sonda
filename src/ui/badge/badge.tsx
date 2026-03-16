@@ -11,10 +11,10 @@ export const Badge: Component<BadgeProps> = (props) => {
     <div
       {...withoutVariants}
       class={badgeRecipe({
-        size: props.size,
-        color: props.color,
-        style: props.style,
         class: props.class,
+        color: props.color,
+        size: props.size,
+        style: props.style,
       })}
     />
   );
