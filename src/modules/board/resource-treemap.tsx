@@ -81,7 +81,6 @@ const toSimpleStructure = (structure: SetValueTreemapStructure): TreemapStructur
 };
 
 export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
-  const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
   const color = d3.scaleSequential([8, 0], d3.interpolateMagma);
 
   const packageStructure = createMemo(() => {
@@ -95,19 +94,6 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     return toSimpleStructure(root);
   });
 
-  const width = 300;
-  const height = 400;
-
-  const treemap = createMemo(() => {
-    return d3
-      .treemap<TreemapStructure>()
-      .size([width, height])
-      .paddingOuter(3)
-      .paddingTop(19)
-      .paddingInner(1)
-      .round(true);
-  });
-
   const hierarchy = createMemo(() => {
     return (
       d3
@@ -118,29 +104,31 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     );
   });
 
-  const root = createMemo(() => {
-    return treemap()(hierarchy());
+  const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
+  const [width, setWidth] = createSignal(300);
+  const [height, setHeight] = createSignal(400);
+
+  const treemap = createMemo(() => {
+    return d3
+      .treemap<TreemapStructure>()
+      .size([width(), height()])
+      .paddingOuter(3)
+      .paddingTop(19)
+      .paddingInner(1)
+      .round(true);
   });
 
-  const shadowId = createUniqueId();
-
-  const group = createMemo(() => d3.group(root(), (d) => d.height));
-
-  // const hierarchy = d3
-  //   .hierarchy(props.data)
-  //   .sum((d) => d.value)
-  //   .toSorted((a, b) => b.value - a.value);
-
-  // d3.treemap().size([width, height]).paddingOuter(3).paddingTop(19).paddingInner(1).round(true)(
-  //   hierarchy,
-  // );
+  const setSize = (svg?: SVGSVGElement) => {
+    setWidth((current) => svg?.clientWidth ?? current);
+    setHeight((current) => svg?.clientHeight ?? current);
+  };
 
   createEffect(svgReference, (svg) => {
     const abortController = new AbortController();
     globalThis.window.addEventListener(
       "resize",
       () => {
-        
+        setSize(svg);
       },
       { signal: abortController.signal },
     );
@@ -149,14 +137,27 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     };
   });
 
+  const onSvgMount = (svg: SVGSVGElement) => {
+    setSvgReference(svg);
+    setSize(svg);
+  };
+
+  const root = createMemo(() => {
+    return treemap()(hierarchy());
+  });
+
+  const shadowId = createUniqueId();
+
+  const group = createMemo(() => d3.group(root(), (d) => d.height));
+
   return (
     <div>
       <svg
-        ref={setSvgReference}
+        ref={onSvgMount}
         class="w-full h-full z-10 isolate"
-        // width={width}
-        // height={height}
-        viewBox={`0 0 ${width} ${height}`}
+        width={width()}
+        height={height()}
+        viewBox={`0 0 ${width()} ${height()}`}
       >
         <filter id={shadowId}>
           <feDropShadow flood-opacity={0.3} dx={0} stdDeviation={3} />
