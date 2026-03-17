@@ -1,10 +1,11 @@
 import * as d3 from "d3";
 import {
-  createEffect,
   createMemo,
   createSignal,
   createUniqueId,
   For,
+  onSettled,
+  Show,
   type Component,
 } from "solid-js";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
@@ -91,9 +92,13 @@ const TreemapItem: Component<TreemapItemProps> = (props) => {
   );
 };
 
-type TreemapContentProps = {
+type TreemapSize = {
   width: number;
   height: number;
+};
+
+type TreemapContentProps = {
+  size: TreemapSize;
   structure: TreemapStructure;
 };
 
@@ -111,7 +116,7 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
   const treemap = createMemo(() => {
     return d3
       .treemap<TreemapStructure>()
-      .size([props.width, props.height])
+      .size([props.size.width, props.size.height])
       .paddingOuter(3)
       .paddingTop(19)
       .paddingInner(1)
@@ -161,49 +166,46 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
     return toSimpleStructure(root);
   });
 
-  const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
-  const [width, setWidth] = createSignal(300);
-  const [height, setHeight] = createSignal(400);
+  const [containerReference, setContainerReference] = createSignal<HTMLDivElement>();
+  const [size, setSize] = createSignal<TreemapSize | null>(null);
 
-  const setSize = (svg?: SVGSVGElement) => {
-    setWidth((current) => svg?.clientWidth ?? current);
-    setHeight((current) => svg?.clientHeight ?? current);
+  const reloadSize = () => {
+    const container = containerReference();
+    if (container) {
+      console.log("[SVG]", container.clientHeight, container.clientWidth);
+      setSize({ height: container.clientHeight, width: container.clientWidth });
+    }
   };
 
-  createEffect(svgReference, (svg) => {
+  onSettled(() => {
+    reloadSize();
+
     const abortController = new AbortController();
-    globalThis.window.addEventListener(
-      "resize",
-      () => {
-        setSize(svg);
-      },
-      { signal: abortController.signal },
-    );
+    globalThis.window.addEventListener("resize", reloadSize, { signal: abortController.signal });
+
     return () => {
       abortController.abort();
     };
   });
 
-  const onSvgMount = (svg: SVGSVGElement) => {
-    setSvgReference(svg);
-    setSize(svg);
-  };
-
   return (
-    <div>
-      <svg
-        ref={onSvgMount}
-        class="w-full h-full z-10 isolate"
-        width={width()}
-        height={height()}
-        viewBox={`0 0 ${width()} ${height()}`}
-      >
-        <TreemapContent height={height()} structure={packageStructure()} width={width()} />
-      </svg>
-      {/* <pre>{JSON.stringify(packageStructure(), null, 2)}</pre>
-      <pre>{JSON.stringify(props.asset, null, 2)}</pre>
-      <pre>{JSON.stringify(props.children, null, 2)}</pre>
-      <pre>{JSON.stringify(props.resource, null, 2)}</pre> */}
+    <div class="w-full h-full" ref={setContainerReference}>
+      <Show when={size()}>
+        {(requiredSize) => (
+          <svg
+            class="w-full h-full z-10 isolate"
+            width={requiredSize().width}
+            height={requiredSize().height}
+            viewBox={`0 0 ${requiredSize().width} ${requiredSize().height}`}
+          >
+            <TreemapContent structure={packageStructure()} size={requiredSize()} />
+          </svg>
+        )}
+      </Show>
     </div>
   );
+  // {/* <pre>{JSON.stringify(packageStructure(), null, 2)}</pre>
+  // <pre>{JSON.stringify(props.asset, null, 2)}</pre>
+  // <pre>{JSON.stringify(props.children, null, 2)}</pre>
+  // <pre>{JSON.stringify(props.resource, null, 2)}</pre> */}
 };

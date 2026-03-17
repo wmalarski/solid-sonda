@@ -1,5 +1,5 @@
 {
-  "name": "solid-sonda",
+  "name": "solid-launch-midnight",
   "version": "0.0.0",
   "description": "",
   "license": "MIT",
@@ -16,11 +16,11 @@
   },
   "dependencies": {
     "@solid-primitives/i18n": "^2.2.1",
-    "@solidjs/web": "2.0.0-beta.2",
+    "@solidjs/web": "2.0.0-beta.1",
     "@tailwindcss/vite": "^4.2.1",
     "d3": "^7.9.0",
     "decode-formdata": "^0.9.0",
-    "solid-js": "^2.0.0-beta.2",
+    "solid-js": "2.0.0-beta.1",
     "tailwind-merge": "3.5.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.2.1",
@@ -38,7 +38,7 @@
     "sonda": "^0.11.1",
     "typescript": "^5.9.3",
     "vite": "^8.0.0",
-    "vite-plugin-solid": "^3.0.0-next.2",
+    "vite-plugin-solid": "3.0.0-next.2",
     "vite-plugin-zip-pack": "1.2.4"
   }
 }

@@ -82,7 +82,7 @@ export const ResourcesList: Component<ResourceListProps> = (props) => {
   };
 
   return (
-    <div class="grid grid-cols-[1fr_2fr] gap-1">
+    <div class="grid grid-cols-[1fr_2fr] gap-1 h-full">
       <Menu class="w-full">
         <For each={matched()} keyed={(entry) => entry.asset.name}>
           {(entry, index) => (
@@ -94,18 +94,16 @@ export const ResourcesList: Component<ResourceListProps> = (props) => {
           )}
         </For>
       </Menu>
-      <div>
-        <Show when={selected()}>
-          {(entry) => (
-            <ResourcesTreemap
-              report={props.report}
-              asset={entry().asset}
-              children={entry().children}
-              resource={entry().resource}
-            />
-          )}
-        </Show>
-      </div>
+      <Show when={selected()}>
+        {(entry) => (
+          <ResourcesTreemap
+            report={props.report}
+            asset={entry().asset}
+            children={entry().children}
+            resource={entry().resource}
+          />
+        )}
+      </Show>
     </div>
   );
 };

@@ -25,7 +25,7 @@ export const BoardRoute: Component = () => {
   const [report, setReport] = createSignal<ReportModel>();
 
   return (
-    <div data-theme={devtoolsTheme() === "dark" ? "business" : "corporate"}>
+    <div class="h-full" data-theme={devtoolsTheme() === "dark" ? "business" : "corporate"}>
       <Show when={report()} fallback={<ReportUploadForm onReportSubmit={setReport} />}>
         {(reportValue) => <ReportBoard report={reportValue()} />}
       </Show>
