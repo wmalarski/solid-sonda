@@ -104,6 +104,7 @@ type TreemapContentProps = {
 
 const TreemapContent: Component<TreemapContentProps> = (props) => {
   const hierarchy = createMemo(() => {
+    console.log("[hierarchy]", props.structure);
     return (
       d3
         .hierarchy(props.structure, (resource) => resource.children)
@@ -114,6 +115,7 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
   });
 
   const treemap = createMemo(() => {
+    console.log("[treemap]", props.size.width, props.size.height);
     return d3
       .treemap<TreemapStructure>()
       .size([props.size.width, props.size.height])
@@ -124,6 +126,7 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
   });
 
   const root = createMemo(() => {
+    console.log("[root]", treemap(), hierarchy());
     return treemap()(hierarchy());
   });
 
@@ -172,7 +175,7 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
   const reloadSize = () => {
     const container = containerReference();
     if (container) {
-      console.log("[SVG]", container.clientHeight, container.clientWidth);
+      console.log("[container]", { height: container.clientHeight, width: container.clientWidth });
       setSize({ height: container.clientHeight, width: container.clientWidth });
     }
   };
