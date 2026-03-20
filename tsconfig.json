@@ -14,13 +14,9 @@
     "noEmit": true,
     // Type Checking & Safety
     "strict": true,
-    "types": [
-      "vite/client", "chrome"
-    ],
+    "types": ["vite/client", "chrome"],
     "paths": {
-      "~/*": [
-        "./src/*"
-      ]
+      "~/*": ["./src/*"]
     }
   }
 }

@@ -5,14 +5,15 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "dev": "MODE=dev vite build --watch",
-    "sonda": "MODE=sonda vite build",
-    "build": "vite build",
-    "serve": "vite preview",
-    "lint": "oxlint --type-aware --fix --fix-suggestions",
-    "format": "oxfmt --write .",
-    "knip": "knip"
+    "start": "vp dev",
+    "dev": "MODE=dev vp build --watch",
+    "sonda": "MODE=sonda vp build",
+    "build": "vp build",
+    "serve": "vp preview",
+    "lint": "vp lint --type-aware --fix --fix-suggestions",
+    "format": "vp fmt --write .",
+    "knip": "knip",
+    "prepare": "vp config"
   },
   "dependencies": {
     "@solid-primitives/i18n": "^2.2.1",
@@ -24,21 +25,20 @@
     "tailwind-merge": "3.5.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.2.2",
-    "valibot": "^1.3.0"
+    "valibot": "^1.3.1"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.38",
     "@types/d3": "^7.4.3",
     "@types/node": "^25.5.0",
+    "@vitejs/devtools": "^0.1.3",
     "daisyui": "^5.5.19",
-    "knip": "^5.88.0",
-    "oxfmt": "^0.41.0",
-    "oxlint": "^1.56.0",
-    "oxlint-tsgolint": "^0.17.0",
-    "sonda": "^0.11.1",
+    "knip": "^6.0.1",
     "typescript": "^5.9.3",
-    "vite": "^8.0.0",
+    "vite": "catalog:",
     "vite-plugin-solid": "3.0.0-next.2",
-    "vite-plugin-zip-pack": "1.2.4"
-  }
+    "vite-plugin-zip-pack": "1.2.4",
+    "vite-plus": "catalog:"
+  },
+  "packageManager": "pnpm@10.32.1"
 }
