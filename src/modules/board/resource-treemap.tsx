@@ -104,7 +104,7 @@ type TreemapContentProps = {
 
 const TreemapContent: Component<TreemapContentProps> = (props) => {
   const hierarchy = createMemo(() => {
-    console.log("[hierarchy]", props.structure);
+    // console.log("[hierarchy]", props.structure);
     return (
       d3
         .hierarchy(props.structure, (resource) => resource.children)
@@ -115,7 +115,7 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
   });
 
   const treemap = createMemo(() => {
-    console.log("[treemap]", props.size.width, props.size.height);
+    // console.log("[treemap]", props.size.width, props.size.height);
     return d3
       .treemap<TreemapStructure>()
       .size([props.size.width, props.size.height])
@@ -126,7 +126,7 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
   });
 
   const root = createMemo(() => {
-    console.log("[root]", treemap(), hierarchy());
+    // console.log("[root]", treemap(), hierarchy());
     return treemap()(hierarchy());
   });
 
@@ -170,13 +170,24 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
   });
 
   const [containerReference, setContainerReference] = createSignal<HTMLDivElement>();
+  // const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
   const [size, setSize] = createSignal<TreemapSize | null>(null);
 
   const reloadSize = () => {
     const container = containerReference();
+    // const svg = svgReference();
     if (container) {
-      console.log("[container]", { height: container.clientHeight, width: container.clientWidth });
-      setSize({ height: container.clientHeight, width: container.clientWidth });
+      // console.log("[container]", {
+      //   h1: svg?.height,
+      //   h2: svg?.clientHeight,
+      //   h3: svg?.scrollHeight,
+      //   height: container.clientHeight,
+      //   w1: svg?.width,
+      //   w2: svg?.clientWidth,
+      //   w3: svg?.scrollWidth,
+      //   width: container.clientWidth,
+      // });
+      setSize({ height: container.clientHeight, width: globalThis.window.innerWidth * (2 / 3) });
     }
   };
 
@@ -192,11 +203,12 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
   });
 
   return (
-    <div class="w-full h-full" ref={setContainerReference}>
+    <div class="w-full h-screen" ref={setContainerReference}>
       <Show when={size()}>
         {(requiredSize) => (
           <svg
-            class="w-full h-full z-10 isolate"
+            // ref={setSvgReference}
+            class="z-10 isolate"
             width={requiredSize().width}
             height={requiredSize().height}
             viewBox={`0 0 ${requiredSize().width} ${requiredSize().height}`}
