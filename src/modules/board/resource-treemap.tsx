@@ -81,6 +81,9 @@ type TreemapItemProps = {
 };
 
 const TreemapItem: Component<TreemapItemProps> = (props) => {
+  const rectId = createUniqueId();
+  const clipPathId = createUniqueId();
+
   const byteFormatter = createByteUnitFormatter();
 
   const title = createMemo(() => {
@@ -91,11 +94,19 @@ const TreemapItem: Component<TreemapItemProps> = (props) => {
   return (
     <g transform={`translate(${props.node.x0},${props.node.y0})`}>
       <rect
+        id={rectId}
         fill={props.colorInterpolation(props.node.height)}
         width={props.node.x1 - props.node.x0}
-        height={Math.max(props.node.y1 - props.node.y0, 12)}
+        height={props.node.y1 - props.node.y0}
       />
-      <text font-size="10" y="1em">
+      <clipPath id={clipPathId}>
+        <use href={`${globalThis.window.location.href}#${rectId}`} />
+      </clipPath>
+      <text
+        clip-path={`url(${globalThis.window.location.href}#${clipPathId})`}
+        font-size="10"
+        y="1em"
+      >
         {title()}
       </text>
     </g>
@@ -127,7 +138,7 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
     return d3
       .treemap<TreemapStructure>()
       .size([props.size.width, props.size.height])
-      .paddingOuter(4)
+      .paddingOuter(2)
       .paddingTop(16)
       .paddingInner(2)
       .round(true);
