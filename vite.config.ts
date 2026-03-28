@@ -20,6 +20,7 @@ const lint: UserConfig["lint"] = {
     FileReader: "readonly",
     FormData: "readonly",
     HTMLElement: "readonly",
+    NumberFormat: "readonly",
     URL: "readonly",
     chrome: "readonly",
     console: "readonly",

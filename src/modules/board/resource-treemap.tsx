@@ -8,6 +8,7 @@ import {
   Show,
   type Component,
 } from "solid-js";
+import { createByteUnitFormatter } from "~/integrations/i18n/format";
 import type { ReportModel, ResourceModel } from "~/integrations/sonda/schema";
 
 type SetValueTreemapStructure = {
@@ -88,6 +89,30 @@ const TreemapItem: Component<TreemapItemProps> = (props) => {
         width={props.node.x1 - props.node.x0}
         height={props.node.y1 - props.node.y0}
       />
+      {/* <text class="z-50" y="1em">
+        {title()}
+      </text> */}
+    </g>
+  );
+};
+
+type TreemapTitleProps = {
+  node: d3.HierarchyRectangularNode<TreemapStructure>;
+};
+
+const TreemapTitle: Component<TreemapTitleProps> = (props) => {
+  const byteFormatter = createByteUnitFormatter();
+
+  const title = createMemo(() => {
+    const name = props.node.data.path.split("/").at(-1);
+    return `${name} - ${byteFormatter().format(props.node.data.sum)}`;
+  });
+
+  return (
+    <g transform={`translate(${props.node.x0},${props.node.y0})`}>
+      <text font-size="10" class="z-50" y="1em">
+        {title()}
+      </text>
     </g>
   );
 };
@@ -134,17 +159,22 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
 
   const group = createMemo(() => d3.group(root(), (d) => d.height));
 
+  const layers = createMemo(() => group().entries().toArray());
+
   return (
     <>
       <filter id={shadowId}>
         <feDropShadow flood-opacity={0.3} dx={0} stdDeviation={3} />
       </filter>
-      <For keyed={([entry]) => entry} each={group().entries().toArray()}>
+      <For keyed={([entry]) => entry} each={layers()}>
         {(entry) => (
           <g filter={shadowId}>
             <For each={entry()[1]}>{(resource) => <TreemapItem node={resource()} />}</For>
           </g>
         )}
+      </For>
+      <For keyed={([entry]) => entry} each={layers()}>
+        {(entry) => <For each={entry()[1]}>{(resource) => <TreemapTitle node={resource()} />}</For>}
       </For>
     </>
   );
