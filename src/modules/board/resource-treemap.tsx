@@ -187,23 +187,11 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
   });
 
   const [containerReference, setContainerReference] = createSignal<HTMLDivElement>();
-  // const [svgReference, setSvgReference] = createSignal<SVGSVGElement>();
   const [size, setSize] = createSignal<TreemapSize | null>(null);
 
   const reloadSize = () => {
     const container = containerReference();
-    // const svg = svgReference();
     if (container) {
-      // console.log("[container]", {
-      //   h1: svg?.height,
-      //   h2: svg?.clientHeight,
-      //   h3: svg?.scrollHeight,
-      //   height: container.clientHeight,
-      //   w1: svg?.width,
-      //   w2: svg?.clientWidth,
-      //   w3: svg?.scrollWidth,
-      //   width: container.clientWidth,
-      // });
       setSize({ height: container.clientHeight, width: globalThis.window.innerWidth * (2 / 3) });
     }
   };
@@ -224,7 +212,6 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
       <Show when={size()}>
         {(requiredSize) => (
           <svg
-            // ref={setSvgReference}
             class="z-10 isolate"
             width={requiredSize().width}
             height={requiredSize().height}
@@ -236,8 +223,4 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
       </Show>
     </div>
   );
-  // {/* <pre>{JSON.stringify(packageStructure(), null, 2)}</pre>
-  // <pre>{JSON.stringify(props.asset, null, 2)}</pre>
-  // <pre>{JSON.stringify(props.children, null, 2)}</pre>
-  // <pre>{JSON.stringify(props.resource, null, 2)}</pre> */}
 };
