@@ -75,32 +75,12 @@ const toSimpleStructure = (structure: SetValueTreemapStructure): TreemapStructur
   };
 };
 
-const colorInterpolation = d3.scaleSequential([8, 0], d3.interpolateMagma);
-
 type TreemapItemProps = {
   node: d3.HierarchyRectangularNode<TreemapStructure>;
+  colorInterpolation: d3.ScaleSequential<string>;
 };
 
 const TreemapItem: Component<TreemapItemProps> = (props) => {
-  return (
-    <g transform={`translate(${props.node.x0},${props.node.y0})`}>
-      <rect
-        fill={colorInterpolation(props.node.height)}
-        width={props.node.x1 - props.node.x0}
-        height={props.node.y1 - props.node.y0}
-      />
-      {/* <text class="z-50" y="1em">
-        {title()}
-      </text> */}
-    </g>
-  );
-};
-
-type TreemapTitleProps = {
-  node: d3.HierarchyRectangularNode<TreemapStructure>;
-};
-
-const TreemapTitle: Component<TreemapTitleProps> = (props) => {
   const byteFormatter = createByteUnitFormatter();
 
   const title = createMemo(() => {
@@ -110,7 +90,12 @@ const TreemapTitle: Component<TreemapTitleProps> = (props) => {
 
   return (
     <g transform={`translate(${props.node.x0},${props.node.y0})`}>
-      <text font-size="10" class="z-50" y="1em">
+      <rect
+        fill={props.colorInterpolation(props.node.height)}
+        width={props.node.x1 - props.node.x0}
+        height={Math.max(props.node.y1 - props.node.y0, 12)}
+      />
+      <text font-size="10" y="1em">
         {title()}
       </text>
     </g>
@@ -129,7 +114,6 @@ type TreemapContentProps = {
 
 const TreemapContent: Component<TreemapContentProps> = (props) => {
   const hierarchy = createMemo(() => {
-    // console.log("[hierarchy]", props.structure);
     return (
       d3
         .hierarchy(props.structure, (resource) => resource.children)
@@ -140,26 +124,28 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
   });
 
   const treemap = createMemo(() => {
-    // console.log("[treemap]", props.size.width, props.size.height);
     return d3
       .treemap<TreemapStructure>()
       .size([props.size.width, props.size.height])
-      .paddingOuter(3)
-      .paddingTop(19)
-      .paddingInner(1)
+      .paddingOuter(4)
+      .paddingTop(16)
+      .paddingInner(2)
       .round(true);
-  });
-
-  const root = createMemo(() => {
-    // console.log("[root]", treemap(), hierarchy());
-    return treemap()(hierarchy());
   });
 
   const shadowId = createUniqueId();
 
-  const group = createMemo(() => d3.group(root(), (d) => d.height));
+  const layers = createMemo(() => {
+    const root = treemap()(hierarchy());
+    return d3
+      .group(root, (d) => d.depth)
+      .entries()
+      .toArray();
+  });
 
-  const layers = createMemo(() => group().entries().toArray());
+  const colorInterpolation = createMemo(() =>
+    d3.scaleSequential([layers().length + 1, 0], d3.interpolateMagma),
+  );
 
   return (
     <>
@@ -169,12 +155,13 @@ const TreemapContent: Component<TreemapContentProps> = (props) => {
       <For keyed={([entry]) => entry} each={layers()}>
         {(entry) => (
           <g filter={shadowId}>
-            <For each={entry()[1]}>{(resource) => <TreemapItem node={resource()} />}</For>
+            <For each={entry()[1]}>
+              {(resource) => (
+                <TreemapItem colorInterpolation={colorInterpolation()} node={resource()} />
+              )}
+            </For>
           </g>
         )}
-      </For>
-      <For keyed={([entry]) => entry} each={layers()}>
-        {(entry) => <For each={entry()[1]}>{(resource) => <TreemapTitle node={resource()} />}</For>}
       </For>
     </>
   );
