@@ -113,6 +113,24 @@ const TreemapItem: Component<TreemapItemProps> = (props) => {
   );
 };
 
+type TreemapTooltipProps = {
+  left: number;
+  top: number;
+  structure?: TreemapStructure;
+};
+
+const TreemapTooltip: Component<TreemapTooltipProps> = (props) => {
+  return (
+    <Show when={props.structure}>
+      {(structure) => (
+        <div style={{ transform: `translate(${props.left}, ${props.top})` }}>
+          <p>{structure().path}</p>
+        </div>
+      )}
+    </Show>
+  );
+};
+
 type TreemapSize = {
   width: number;
   height: number;
@@ -186,6 +204,8 @@ type ResourcesTreemapProps = {
 };
 
 export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
+  const [hoveredStructure] = createSignal<TreemapStructure>();
+
   const packageStructure = createMemo(() => {
     const root: SetValueTreemapStructure = { children: new Map(), path: "/" };
 
@@ -232,6 +252,7 @@ export const ResourcesTreemap: Component<ResourcesTreemapProps> = (props) => {
           </svg>
         )}
       </Show>
+      <TreemapTooltip left={0} top={0} structure={hoveredStructure()} />
     </div>
   );
 };
